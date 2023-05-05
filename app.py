@@ -26,7 +26,7 @@ def on_snapshot(doc_snapshot, changes, read_time):
         #     # client_data['inviteEmails'],
         # ]
         st.json(client_data)
-        # print('row', row)
+        print('data', client_data)
 
 
 collection_watch = clients_ref.on_snapshot(on_snapshot)
