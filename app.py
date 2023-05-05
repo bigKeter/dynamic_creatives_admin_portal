@@ -2,6 +2,7 @@ import streamlit as st
 from utils.firebase import init_firebase
 from firebase_admin import firestore
 import asyncio
+import builtins
 
 # Initialize the Firebase Admin SDK
 init_firebase()
@@ -30,7 +31,7 @@ async def display_table():
     st.table(data)
 
 
-@st.cache(ttl=60)  # add caching to reduce the number of requests
+@st.cache(hash_funcs={builtins.coroutine: id})
 async def run_async():
     await get_data()
     await display_table()
