@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.firebase import init_firebase
 from firebase_admin import firestore
+import asyncio
 
 # Initialize the Firebase Admin SDK
 init_firebase()
@@ -10,23 +11,29 @@ clients_ref = firestore.client().collection('clients')
 
 data = []
 
-for doc in clients_ref.stream():
-    print('{} => {}'.format(doc.id, doc.to_dict()))
 
-# @st.cache_data
-
-st.text('Clients')
-
-
-def on_snapshot(doc_snapshot, changes, read_time):
-    for doc in doc_snapshot:
+async def get_data():
+    snapshot = await clients_ref.get()
+    for doc in snapshot:
         client_data = doc.to_dict()
-        # row = [
-        #     client_data['name'],
-        #     # client_data['inviteEmails'],
-        # ]
-        st.json(client_data)
-        print('data', client_data)
+        row = [
+            client_data['name'],
+            # client_data['inviteEmails'],
+        ]
+        data.append(row)
+        print('row', row)
 
 
-collection_watch = clients_ref.on_snapshot(on_snapshot)
+async def display_table():
+    while len(data) == 0:
+        await asyncio.sleep(1)
+    st.table(data)
+
+
+async def main():
+    tasks = [get_data(), display_table()]
+    await asyncio.gather(*tasks)
+
+if __name__ == '__main__':
+    st.text('Clients')
+    asyncio.run(main())
