@@ -13,7 +13,7 @@ data = []
 
 
 async def get_data():
-    snapshot = await clients_ref.get()
+    snapshot = await asyncio.to_thread(clients_ref.get)
     for doc in snapshot:
         client_data = doc.to_dict()
         row = [
@@ -30,7 +30,6 @@ async def display_table():
     st.table(data)
 
 
-@st.cache(hash_funcs={asyncio.coroutine: id})
 async def run_async():
     await get_data()
     await display_table()
