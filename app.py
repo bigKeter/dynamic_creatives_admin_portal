@@ -30,10 +30,18 @@ async def display_table():
     st.table(data)
 
 
-async def main():
-    tasks = [get_data(), display_table()]
-    await asyncio.gather(*tasks)
+@st.cache(ttl=60)  # add caching to reduce the number of requests
+async def run_async():
+    await get_data()
+    await display_table()
+
+
+def main():
+    st.text('Clients')
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(run_async())
+
 
 if __name__ == '__main__':
-    st.text('Clients')
-    asyncio.run(main())
+    main()
