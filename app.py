@@ -1,7 +1,7 @@
 # app.py
 import asyncio
 import streamlit as st
-import json
+import pandas as pd
 from typing import Coroutine, Any
 from firebase_admin import firestore
 from utils.firebase_init import init_firebase
@@ -56,6 +56,7 @@ async def main():
     # Convert Arrow objects to strings
     for client in clients:
         client['users'] = str(client['users'])
+
         client['briefs'] = str(client['briefs'])
 
     # Display a table with each client name and a list of invited users as tags
