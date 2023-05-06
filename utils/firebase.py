@@ -1,29 +1,69 @@
-from dotenv import load_dotenv
-from firebase_admin import credentials, initialize_app, db, exceptions, firestore
-import os
+from firebase_admin import firestore_async, firestore
+from utils.firebase_init import init_firebase
 
-# Load the Firebase environment variables from the .env file
-load_dotenv()
+init_firebase()
+
+# Get a reference to the Firestore database
+db = firestore.client()
+
+# Get collection documents using collection name
 
 
-def init_firebase():
-    try:  # Check if the Firebase Admin SDK has already been initialized
-        # Create a credentials object using the Firebase environment variables
-        cred = credentials.Certificate({
-            "type": os.getenv("FIREBASE_TYPE"),
-            "project_id": os.getenv("FIREBASE_PROJECT_ID"),
-            "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID"),
-            "private_key": os.getenv("FIREBASE_PRIVATE_KEY").replace("\\n", "\n"),
-            "client_email": os.getenv("FIREBASE_CLIENT_EMAIL"),
-            "client_id": os.getenv("FIREBASE_CLIENT_ID"),
-            "auth_uri": os.getenv("FIREBASE_AUTH_URI"),
-            "token_uri": os.getenv("FIREBASE_TOKEN_URI"),
-            "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
-            "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_X509_CERT_URL")
-        })
+def get_collection_docs(collection_name):
+    ref = db.collection(collection_name)
+    docs = ref.stream()
+    for doc in docs:
+        print(f'{doc.id} => {doc.to_dict()}')
+    return docs
 
-        # Initialize the Firebase Admin SDK with the credentials object
-        initialize_app(cred)
-    except ValueError:
-        # Firebase has already been initialized
-        pass
+# Get document data using collection name and document name
+
+
+async def get_doc_data(collection_name, doc_name):
+    try:
+        ref = db.collection(collection_name).document(doc_name)
+        doc = ref.stream()
+        print(f'{doc.id} => {doc.to_dict()}')
+        return doc
+    except Exception as e:
+        print(f'Error getting document: {e}')
+        return None
+
+# Update document data using collection name, document reference, and data
+
+
+async def update_doc_data(collection_name, doc_ref, data):
+    try:
+        ref = db.collection(collection_name).document(doc_ref)
+        ref.set(data)
+        print(f'{doc_ref} => {data}')
+        return True
+    except Exception as e:
+        print(f'Error updating document: {e}')
+        return False
+
+# Delete document data using collection name and document reference
+
+
+async def delete_doc_data(collection_name, doc_ref):
+    try:
+        ref = db.collection(collection_name).document(doc_ref)
+        ref.delete()
+        print(f'{doc_ref} => deleted')
+        return True
+    except Exception as e:
+        print(f'Error deleting document: {e}')
+        return False
+
+# Add document data using collection name and data
+
+
+async def add_doc_data(collection_name, data):
+    try:
+        ref = db.collection(collection_name).document()
+        ref.set(data)
+        print(f'{ref.id} => {data}')
+        return True
+    except Exception as e:
+        print(f'Error adding document: {e}')
+        return False
