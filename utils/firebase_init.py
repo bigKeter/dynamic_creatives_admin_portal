@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from firebase_admin import credentials, initialize_app, db, exceptions, firestore
+from firebase_admin import credentials, initialize_app
 import os
 
 # Load the Firebase environment variables from the .env file
