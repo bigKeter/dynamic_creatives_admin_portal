@@ -2,3 +2,4 @@ streamlit
 firebase_admin
 python-dotenv
 pandas
+streamlit-aggrid
