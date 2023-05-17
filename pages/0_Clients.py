@@ -18,7 +18,7 @@ users_docs = loop.run_until_complete(get_docs("users"))
 # Set page config and info
 st.set_page_config(page_title="Clients Page", page_icon="👥")
 st.sidebar.header("Clients Page")
-st.write(
+st.subheader(
     """
     This page contains data about clients.
     """
@@ -32,19 +32,20 @@ user_names = loop.run_until_complete(get_names(users_docs))
 print_data(clients)
 
 # Expander to add new client
-with st.expander("Add new client"):
-    name = st.text_input("name")
-    inviteEmail = st.text_input("inviteEmail")
-    users = selectbox("Existing Users", user_names)
-    submit = st.button("Add new client")
+with st.sidebar:
+    with st.expander("Add new client"):
+        name = st.text_input("name")
+        inviteEmail = st.text_input("inviteEmail")
+        users = selectbox("Existing Users", user_names)
+        submit = st.button("Add new client")
 
-    if submit:
-        users_ref = loop.run_until_complete(get_reference("users", users))
+        if submit:
+            users_ref = loop.run_until_complete(get_reference("users", users))
 
-        object = {
-            "name": name,
-            "inviteEmail": inviteEmail,
-            "users": users_ref,
-            "createdAt": datetime.now(),
-        }
-        loop.run_until_complete(create_doc(object, "clients"))
+            object = {
+                "name": name,
+                "inviteEmail": inviteEmail,
+                "users": users_ref,
+                "createdAt": datetime.now(),
+            }
+            loop.run_until_complete(create_doc(object, "clients"))
