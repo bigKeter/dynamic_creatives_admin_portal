@@ -1,6 +1,15 @@
 import pandas as pd
 import streamlit as st
-from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
+
+star_rating = JsCode(
+    js_code="""
+function randomStarRating(params) {
+    const numStars = Math.floor(Math.random() * 5) + 1;
+    return '★'.repeat(numStars) + '☆'.repeat(5 - numStars);
+}
+"""
+)
 
 
 def print_data(data):
@@ -17,6 +26,17 @@ def print_data(data):
     )  # Enable multi-row selection
     gridOptions = gb.build()
 
+    gridOptions["columnDefs"].append(
+        {
+            "field": "stars",
+            "headerName": "Stars",
+            "cellRenderer": star_rating,
+            "cellRendererParams": {
+                "color": "red",
+                "background_color": "black",
+            },
+        }
+    )
     grid_response = AgGrid(
         df,
         gridOptions=gridOptions,
@@ -25,6 +45,7 @@ def print_data(data):
         fit_columns_on_grid_load=True,
         theme="streamlit",  # Add theme color to the table
         enable_enterprise_modules=True,
+        allow_unsafe_jscode=True,
         height=350,
         width="100%",
         reload_data=False,
